@@ -1,0 +1,28 @@
+evo_config:
+  _target_: shinka.core.EvolutionConfig
+  patch_types:
+    - "diff"
+    - "full"
+  patch_type_probs:
+    - 0.6
+    - 0.4
+  num_generations: 15
+  max_parallel_jobs: 2
+  max_patch_resamples: 2
+  max_patch_attempts: 3
+  llm_models:
+    - "meta-llama/llama-3.3-70b-instruct:free"
+  llm_dynamic_selection: null
+  llm_kwargs:
+    temperatures:
+      - 0.0
+      - 0.7
+    max_tokens: 8192
+  meta_rec_interval: 5
+  meta_llm_models:
+    - "meta-llama/llama-3.3-70b-instruct:free"
+  meta_llm_kwargs:
+    temperatures:
+      - 0.0
+  embedding_model: "ollama-nomic-embed-text"
+  results_dir: ${output_dir}
