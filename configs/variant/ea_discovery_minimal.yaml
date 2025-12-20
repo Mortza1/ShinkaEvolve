@@ -1,0 +1,14 @@
+defaults:
+  - override /database@_global_: island_small
+  - override /evolution@_global_: openrouter_small
+  - override /task@_global_: ea_discovery
+  - override /cluster@_global_: local
+  - _self_
+
+variant_suffix: "_minimal"
+
+# Override to make it even smaller for testing
+evo_config:
+  num_generations: 10
+  max_parallel_jobs: 1
+  max_patch_attempts: 2

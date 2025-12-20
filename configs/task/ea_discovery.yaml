@@ -1,0 +1,69 @@
+ea_discovery_number_of_samples: 5
+
+evaluate_function:
+  _target_: examples.ea_discovery.evaluate.evaluate_program
+  program_path: ???
+  results_dir: ???
+  num_samples: ${ea_discovery_number_of_samples}
+
+# No LLM judge for base evaluation - only use it for novelty checking if desired
+# Or we can add it for scoring
+llm_judge_config:
+  _target_: examples.ea_discovery.lm_judge_prompt.make_lm_input_and_output_processors
+  number_of_samples: ${ea_discovery_number_of_samples}
+
+distributed_job_config:
+  _target_: shinka.launch.SlurmCondaJobConfig
+  modules:
+  - "cuda/12.4"
+  - "cudnn/8.9.7"
+  - "hpcx/2.20"
+  eval_program_path: "shinka/eval_hydra.py"
+  conda_env: "shinka"
+  time: "00:05:00"
+  cpus: 1
+  gpus: 0
+  mem: "4G"
+
+evo_config:
+  task_sys_msg: |
+    You are designing an evolutionary algorithm (EA) for bitstring optimization problems.
+
+    Write a Python function with this signature:
+    def run_ea(problem_seed: int) -> dict
+
+    The function should:
+    1. Implement a population-based evolutionary algorithm
+    2. Use the FITNESS_FUNCTION(bitstring) to evaluate candidate solutions
+    3. Run for up to MAX_EVALUATIONS fitness evaluations
+    4. Return metrics: {"best_fitness": float, "diversity": float, "evaluations": int}
+
+    The EA will be tested on multiple problems (OneMax, LeadingOnes, Trap functions).
+    It should be GENERAL, not hardcoded for specific problems.
+
+    Key requirements:
+    - Use population-based search (not random search or hill climbing)
+    - Implement meaningful selection and variation operators
+    - Track population diversity
+    - Be robust across different problem instances
+
+    Judges will evaluate:
+    1. Algorithmic sophistication (real EA mechanisms)
+    2. Generalization (works across different problems)
+    3. Novelty (interesting/unusual algorithmic patterns)
+
+    Think creatively! You can combine ideas from genetic algorithms, evolution strategies,
+    and other population-based methods. Adaptive parameters and hybrid approaches are encouraged.
+
+    Now design an innovative evolutionary algorithm!
+
+  language: "python"
+  init_program_path:
+    _target_: shinka.utils.add_evolve_markers
+    save_dir: ${output_dir}
+    initial_file_path: examples/ea_discovery/initial.py
+    insert_start: run_ea
+    insert_end: run_ea
+  job_type: "local"
+
+exp_name: "shinka_ea_discovery"
